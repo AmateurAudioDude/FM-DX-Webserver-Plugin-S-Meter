@@ -1,7 +1,7 @@
 // Plugin configuration, this is used in the administration when plugins are loaded
 var pluginConfig = {
     name: 'Signal Meter Small',
-    version: '1.3.5',
+    version: '1.3.6',
     author: 'AAD',
     frontEndPath: 'SignalMeterSmall/pluginSignalMeterSmall.js'
 }

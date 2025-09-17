@@ -1,5 +1,5 @@
 /*
-    Signal Meter Small v1.3.5 by AAD
+    Signal Meter Small v1.3.6 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter
 
     Original concept by Analog Signal Meter: https://github.com/NO2CW/FM-DX-Webserver-analog-signal-meter
@@ -23,11 +23,12 @@ var pluginSignalMeterSmallSquelchActive = false;
   const meterBeginsAtS0 = true;               // Strictly S0-S9+60 meter range
   const useThemeColors = true;                // Background matches theme
   const radioNoiseFloor = -123;               // The reported dBm signal reading with no antenna connected used to calibrate enableLowSignalInterpolation
-  const meterLocation = 'auto';               // Set to 'auto' for default position, or force with 'signal', 'sdr-graph', 'sdr-graph-only, 'peakmeter', or 'auto-rotator'
+  const meterLocation = 'auto';               // Set to 'auto' for default position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'
+  const useLegacyImages = false;              // Set to true to use original base64 PNG images instead of manually drawn numbers and scale markers
 
   //////////////////////////////////////////////////
 
-  const pluginVersion = '1.3.5';
+  const pluginVersion = '1.3.6';
   const pluginName = "Signal Meter Small";
   const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter/refs/heads/main/SignalMeterSmall/pluginSignalMeterSmall.js";
@@ -57,6 +58,7 @@ var pluginSignalMeterSmallSquelchActive = false;
           const panels = Array.from(document.querySelectorAll('.panel-33'));
           let isOutsideField = OutsideField;
           let setMeterLocation = meterLocation;
+          if (setMeterLocation === 'sdr-graph-only' && window.innerWidth < 480 && window.innerHeight > window.innerWidth) setMeterLocation = 'auto';
           if (setMeterLocation === 'auto-rotator') setMeterLocation = 'auto';
           if (localStorage.getItem("showPeakmeter") !== null && (setMeterLocation === 'auto' || setMeterLocation === 'sdr-graph-only')) {
             if (setMeterLocation === 'auto') {
@@ -335,15 +337,17 @@ var pluginSignalMeterSmallSquelchActive = false;
           markerCanvas.height = 13;
 
           const backgroundImage = new Image();
-          if (!meterBeginsAtS0) {
-            backgroundImage.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAMCAMAAAC6GZObAAAAB3RJTUUH6AYBCTY2SEie6QAAAAlwSFlzAAAK8AAACvABQqw0mAAAAOpQTFRFAP8Af/9/v/+//wAA/39//6+v/7+/////////////////////////////////////////////////////////////AP8Af/9//wAA/39/////////////////////////////////////////////////////////////////////////////f/9/////////////////////////////////////////////////////////////////////////////AP8A/zAw////////////////////////////////////////////h5eLSwAAAE50Uk5TAAAAAAAAAAAECAwQFBgcHyAjJygrLzAwMDAzNzs/Q0dLT1NXW19jZ2tvc3d7f3+Dh4uPk5ebn6Onq6+zt7u/w8fIyMvP09fb3+Pn6+/z2M/URgAAAkRJREFUSMfllVt3mkAUhUlNuwcBJabkBlTUJoRgNJJmEITxglFim///d/pQoyNOXE2Wecp5OvPNXmdm7TkHpPZ8xGR83pDyY7iVz2xAdxE6+MwGQGv9tsV7p6cHq/iY/MvWmefnh1uxf/aNMyCzjx9/rNe3t+t8PJYkaZXzfA+5JEnj8cGWAZNJkXzdLyuVSpPJIWeAHafXr3THyYm0io/Jtw04Oyttxf4Zb8Dr0yF3GkJuxpEh4j1KLQFWKaW+SN9IqFZATg9mQlWOkC7zofUH/Inl+9QtMuB6S6dSStVaHFU367U3dDsMiMKOkCeVCybiI10vCzDRdU9UqDJV6n0eMFwGOZlVWg8cagZkYEVO9fEF2R14V3Km84zqgBkyFJgd6DoZGWa6RDoF3B65M3ndDgPKl2IDYLTbopdmD0FZqCeZImwkaM9cUXtqf0duxCBzDlWBYS0Hhstfte1RW9GcVF4zzU5aJklVhgJr0vBGmQL58sBWYmsDL/I53U4D8JoB9eBOZMCdfHX/ljrxIHxar3y6oA3kVri68BIFHnKA6cuHTaa0duRH2ppZdB713CswFJjlEuoNV/V60ZxarEvCFlfvHQYQF1iIWroJI/r/BkDZIZXh5ggAuTJDjfEo8ICsQubyegSaGno/eUZ19Bn74xeYdQHvOpeVGTcC9034N7zuHR3wK2GiDTntT823NFIcZxsfTQNAjm7KUQPOM2N1J2PeC1KqqGf9ocKzmvzPrQI7moYj1R2Omi83rAHVLBypvO4vLbqZlIEXd4UAAAAASUVORK5CYII=`;
-          } else {
-            backgroundImage.src = ` data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAAYCAMAAAC7vLUXAAAAB3RJTUUH6AoCBgkwJewUMgAAAAlwSFlzAAAK8AAACvABQqw0mAAAAE5QTFRFAP8A/wAA/2Bg////////////AP8A/wAA////////////////////////////AP8A/wAA////////////////////////AP8A/2Bg////SV+9OwAAABd0Uk5TAAAAABAgMDAwQFBgcH+PkZGfr7/P3++KEr+hAAAEJ0lEQVRo3u2a3XLbOAyF0z1kK5CCEoo/znn/F90LShs3ESXKnWTb2rzITORPMAgcgyClJ1wPLSTzgMe4m/F0/c/IMmlgsY+43KcAIh2AwPERl3sWwGPcrQCUDP7RAdyvADCRZH6UgbsVAIybEh8Lwf0KAABmzoe3fX9+/v60Mf6o6x3h+fHy8uNbx/gjuI4mcAYAfy2Ay2XztufL5bmG8uP1Fv97XK9eP18uzz0CeHl9fTmE/vmduSqAl9fXlx4BcHbiC/1DAPcpgCGRJCc8loD7XAIAUR17zgGf/obRMc9vf9PobQK7hsg5XPXE+cIgIiLdNxipo/8E2/genZvqwgHrVGssrOrO9sm41cw+B2CZyS63zNkcx/bAv9sEYCN5AjeJJGM3H3mKF9ah3TcUksUfUZlx8b00M2EiSQYAftfnoawe+qO5jT3cMmcBwu7Uq39z295NAnAl5zMCCBxhTjxiYLihAkzsLUqmFIFN7WdeVADKyFh9t7mYJjXCBHpYJgvdyIQSAHIR2MShycnqvi2BiiNOuVQAz2DM/GHuq7mp+qdNezcJIM4mnhHAPAGwPc3lVWhPDpO7K4anBzC0/aHWP4wwjAD8lnipAFJaTFX95bItABs9AE/X5P4TQCyGiiNO1/inYgD74ehmwar7UN+0d5MABuCUAK7C3pVLeuvEnDOv3QVgRZl2BTAAjBAqALN1NvYmU0ddAjJx2K4ASyW0TW4VgKMDFUfclCFuAFAznMo25ugh44C2vVubwJMCEJ36C4AwkCynnkqZEk9IcVljG+2qMqpqDe4qltimgFTsQryXoapGqqoAXufisc151cCg6mshox5yMSWSYRHou3S8Ycqx1B5g278vE4CPTP09GpOFlGI+pwAAmZNoo43RpaPkrgCuKQS2Egu+9adTYnQNLi5YhBa7I4A3Li5r+6YArsyxaO0B/mcBABgZups6syyYn1IA6iYmu1g2PxMRBhGpaR+rF+8FcE0FegAlbQVYRALXHaoJ9NvcIDJyFBns2n4ccBgGAMhp6WR+TscbpjXoJTf8+0oBIJ1cNc68mHSqAACAAdrPvNbVnRHC2sCGJlXzj0izrPLtHsAwNrm6aCtjjJE5DvvcmoWydDI5t3qAtUC07H2FAEwNXy7dtcKdzOm5AjDEEcDYbkqvBICSAegWW6kl/9WcKXl7F+DoUZv1Flcz5uMqgH2u/qBNiZhpAfkg0HUXUBIAy9T83i+pADODuNi9ubOleNF2k/7LBSBRRUvb/nJ0BkZAOcu4yaoAGJlUVT1MKV623qkTBWByUfGZ0uSs2p+kdcBNnMUlOgiTc/nDmcZqTleuZe9LBGACydK/uR8yyWg+qQAAQyQZj8+CGVHfkkp2/9CScXF63P3K7HDEXW1D97lpPcz0hSyy89tYuIa9fwFEdNtVVjch3wAAAABJRU5ErkJggg==`;
+          if (useLegacyImages) {
+              if (!meterBeginsAtS0) {
+                backgroundImage.src = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAMCAMAAAC6GZObAAAAB3RJTUUH6AYBCTY2SEie6QAAAAlwSFlzAAAK8AAACvABQqw0mAAAAOpQTFRFAP8Af/9/v/+//wAA/39//6+v/7+/////////////////////////////////////////////////////////////AP8Af/9//wAA/39/////////////////////////////////////////////////////////////////////////////f/9/////////////////////////////////////////////////////////////////////////////AP8A/zAw////////////////////////////////////////////h5eLSwAAAE50Uk5TAAAAAAAAAAAECAwQFBgcHyAjJygrLzAwMDAzNzs/Q0dLT1NXW19jZ2tvc3d7f3+Dh4uPk5ebn6Onq6+zt7u/w8fIyMvP09fb3+Pn6+/z2M/URgAAAkRJREFUSMfllVt3mkAUhUlNuwcBJabkBlTUJoRgNJJmEITxglFim///d/pQoyNOXE2Wecp5OvPNXmdm7TkHpPZ8xGR83pDyY7iVz2xAdxE6+MwGQGv9tsV7p6cHq/iY/MvWmefnh1uxf/aNMyCzjx9/rNe3t+t8PJYkaZXzfA+5JEnj8cGWAZNJkXzdLyuVSpPJIWeAHafXr3THyYm0io/Jtw04Oyttxf4Zb8Dr0yF3GkJuxpEh4j1KLQFWKaW+SN9IqFZATg9mQlWOkC7zofUH/Inl+9QtMuB6S6dSStVaHFU367U3dDsMiMKOkCeVCybiI10vCzDRdU9UqDJV6n0eMFwGOZlVWg8cagZkYEVO9fEF2R14V3Km84zqgBkyFJgd6DoZGWa6RDoF3B65M3ndDgPKl2IDYLTbopdmD0FZqCeZImwkaM9cUXtqf0duxCBzDlWBYS0Hhstfte1RW9GcVF4zzU5aJklVhgJr0vBGmQL58sBWYmsDL/I53U4D8JoB9eBOZMCdfHX/ljrxIHxar3y6oA3kVri68BIFHnKA6cuHTaa0duRH2ppZdB713CswFJjlEuoNV/V60ZxarEvCFlfvHQYQF1iIWroJI/r/BkDZIZXh5ggAuTJDjfEo8ICsQubyegSaGno/eUZ19Bn74xeYdQHvOpeVGTcC9034N7zuHR3wK2GiDTntT823NFIcZxsfTQNAjm7KUQPOM2N1J2PeC1KqqGf9ocKzmvzPrQI7moYj1R2Omi83rAHVLBypvO4vLbqZlIEXd4UAAAAASUVORK5CYII=`;
+              } else {
+                backgroundImage.src = ` data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAAYCAMAAAC7vLUXAAAAB3RJTUUH6AoCBgkwJewUMgAAAAlwSFlzAAAK8AAACvABQqw0mAAAAE5QTFRFAP8A/wAA/2Bg////////////AP8A/wAA////////////////////////////AP8A/wAA////////////////////////AP8A/2Bg////SV+9OwAAABd0Uk5TAAAAABAgMDAwQFBgcH+PkZGfr7/P3++KEr+hAAAEJ0lEQVRo3u2a3XLbOAyF0z1kK5CCEoo/znn/F90LShs3ESXKnWTb2rzITORPMAgcgyClJ1wPLSTzgMe4m/F0/c/IMmlgsY+43KcAIh2AwPERl3sWwGPcrQCUDP7RAdyvADCRZH6UgbsVAIybEh8Lwf0KAABmzoe3fX9+/v60Mf6o6x3h+fHy8uNbx/gjuI4mcAYAfy2Ay2XztufL5bmG8uP1Fv97XK9eP18uzz0CeHl9fTmE/vmduSqAl9fXlx4BcHbiC/1DAPcpgCGRJCc8loD7XAIAUR17zgGf/obRMc9vf9PobQK7hsg5XPXE+cIgIiLdNxipo/8E2/genZvqwgHrVGssrOrO9sm41cw+B2CZyS63zNkcx/bAv9sEYCN5AjeJJGM3H3mKF9ah3TcUksUfUZlx8b00M2EiSQYAftfnoawe+qO5jT3cMmcBwu7Uq39z295NAnAl5zMCCBxhTjxiYLihAkzsLUqmFIFN7WdeVADKyFh9t7mYJjXCBHpYJgvdyIQSAHIR2MShycnqvi2BiiNOuVQAz2DM/GHuq7mp+qdNezcJIM4mnhHAPAGwPc3lVWhPDpO7K4anBzC0/aHWP4wwjAD8lnipAFJaTFX95bItABs9AE/X5P4TQCyGiiNO1/inYgD74ehmwar7UN+0d5MABuCUAK7C3pVLeuvEnDOv3QVgRZl2BTAAjBAqALN1NvYmU0ddAjJx2K4ASyW0TW4VgKMDFUfclCFuAFAznMo25ugh44C2vVubwJMCEJ36C4AwkCynnkqZEk9IcVljG+2qMqpqDe4qltimgFTsQryXoapGqqoAXufisc151cCg6mshox5yMSWSYRHou3S8Ycqx1B5g278vE4CPTP09GpOFlGI+pwAAmZNoo43RpaPkrgCuKQS2Egu+9adTYnQNLi5YhBa7I4A3Li5r+6YArsyxaO0B/mcBABgZups6syyYn1IA6iYmu1g2PxMRBhGpaR+rF+8FcE0FegAlbQVYRALXHaoJ9NvcIDJyFBns2n4ccBgGAMhp6WR+TscbpjXoJTf8+0oBIJ1cNc68mHSqAACAAdrPvNbVnRHC2sCGJlXzj0izrPLtHsAwNrm6aCtjjJE5DvvcmoWydDI5t3qAtUC07H2FAEwNXy7dtcKdzOm5AjDEEcDYbkqvBICSAegWW6kl/9WcKXl7F+DoUZv1Flcz5uMqgH2u/qBNiZhpAfkg0HUXUBIAy9T83i+pADODuNi9ubOleNF2k/7LBSBRRUvb/nJ0BkZAOcu4yaoAGJlUVT1MKV623qkTBWByUfGZ0uSs2p+kdcBNnMUlOgiTc/nDmcZqTleuZe9LBGACydK/uR8yyWg+qQAAQyQZj8+CGVHfkkp2/9CScXF63P3K7HDEXW1D97lpPcz0hSyy89tYuIa9fwFEdNtVVjch3wAAAABJRU5ErkJggg==`;
+              }
+
+              backgroundImage.onload = function() {
+                  ctx.drawImage(backgroundImage, 0, 0, signalMeter.width, signalMeter.height - 1);
+              };
           }
-          
-          backgroundImage.onload = function() {
-              ctx.drawImage(backgroundImage, 0, 0, signalMeter.width, signalMeter.height - 1);
-          };
 
           // Draw squelch marker
           function drawMarker() {
@@ -388,10 +392,12 @@ var pluginSignalMeterSmallSquelchActive = false;
                       const rect = markerCanvas.getBoundingClientRect();
                       let mouseX, touchX;
 
+                      const scaleX = markerCanvas.width / rect.width; // Consider width percentage
+
                       if (event.type === 'mousedown') {
-                          mouseX = event.clientX - rect.left; // X position relative to canvas
+                          mouseX = (event.clientX - rect.left) * scaleX; // X position relative to canvas
                       } else if (event.type === 'touchstart') {
-                          touchX = event.touches[0].clientX - rect.left; // X position relative to canvas for touch
+                          touchX = (event.touches[0].clientX - rect.left) * scaleX; // X position relative to canvas for touch
                       }
 
                       markerPosition = mouseX || touchX;
@@ -423,7 +429,8 @@ var pluginSignalMeterSmallSquelchActive = false;
               function mouseMoveHandler(event) {
                   if (isDragging) {
                       const rect = markerCanvas.getBoundingClientRect();
-                      let mouseX = event.clientX - rect.left; // X position relative to canvas
+                      const scaleX = markerCanvas.width / rect.width; // Consider width percentage
+                      let mouseX = (event.clientX - rect.left) * scaleX; // X position relative to canvas
                       markerPosition = mouseX - offsetX;
 
                       // Ensure marker stays within canvas bounds
@@ -437,7 +444,8 @@ var pluginSignalMeterSmallSquelchActive = false;
               function touchMoveHandler(event) {
                   if (isDragging) {
                       const rect = markerCanvas.getBoundingClientRect();
-                      let touchX = event.touches[0].clientX - rect.left; // X position relative to canvas
+                      const scaleX = markerCanvas.width / rect.width; // Consider width percentage
+                      let touchX = (event.touches[0].clientX - rect.left) * scaleX; // X position relative to canvas
                       markerPosition = touchX - offsetX;
 
                       // Ensure marker stays within canvas bounds
@@ -551,45 +559,78 @@ var pluginSignalMeterSmallSquelchActive = false;
               // Resize if needed
               let width, margin;
 
-              if (windowWidth > 768) {
-                  switch (true) {
-                      case (windowWidth <= 880):
-                          width = '192px';
-                          if (isOutsideField) { margin = (offset + 32) + 'px'; }
-                          break;
-                      case (windowWidth <= 928):
-                          width = '208px';
-                          if (isOutsideField) { margin = (offset + 24) + 'px'; }
-                          break;
-                      case (windowWidth <= 976):
-                          width = '224px';
-                          if (isOutsideField) { margin = (offset + 16) + 'px'; }
-                          break;
-                      case (windowWidth <= 1024):
-                          width = '240px';
-                          if (isOutsideField) { margin = (offset + 8) + 'px'; }
-                          break;
-                      default:
-                          width = '256px';
-                          margin = offset + 'px';
+              if (useLegacyImages) {
+                  // Legacy images
+                  if (windowWidth > 768) {
+                      switch (true) {
+                          case (windowWidth <= 880):
+                              width = '192px';
+                              if (isOutsideField) { margin = (offset + 32) + 'px'; }
+                              break;
+                          case (windowWidth <= 928):
+                              width = '208px';
+                              if (isOutsideField) { margin = (offset + 24) + 'px'; }
+                              break;
+                          case (windowWidth <= 976):
+                              width = '224px';
+                              if (isOutsideField) { margin = (offset + 16) + 'px'; }
+                              break;
+                          case (windowWidth <= 1024):
+                              width = '240px';
+                              if (isOutsideField) { margin = (offset + 8) + 'px'; }
+                              break;
+                          default:
+                              width = '256px';
+                              margin = offset + 'px';
+                      }
+                      signalMeter.style.width = width;
+                      signalMeter.width = parseInt(width);
+                      markerCanvas.style.width = width;
+                      markerCanvas.width = parseInt(width);
+                      if (isOutsideField) { signalMeter.style.margin = '4px 0 0 ' + margin; }
+                      if (isOutsideField) { markerCanvas.style.margin = '4px 0 0 ' + margin; } else { markerCanvas.style.margin = '4px 0 0 -' + width; }
+                      if (isEnabledSquelch) { drawMarker(markerPosition); }
+                  } else {
+                      width = '256px';
+                      margin = offset + 'px';
+                      signalMeter.style.width = width;
+                      signalMeter.width = parseInt(width);
+                      if (isEnabledSquelch) { markerCanvas.style.width = width; }
+                      if (isEnabledSquelch) { markerCanvas.width = parseInt(width); }
+                      if (isOutsideField) { signalMeter.style.margin = '2px 0 0 ' + margin; }
+                      if (isOutsideField) { markerCanvas.style.margin = '2px 0 0 ' + margin; } else if (isEnabledSquelch) { markerCanvas.style.margin = '2px 0 0 -' + width; }
+                      if (isEnabledSquelch) { drawMarker(markerPosition); }
                   }
-                  signalMeter.style.width = width;
-                  signalMeter.width = parseInt(width);
-                  markerCanvas.style.width = width;
-                  markerCanvas.width = parseInt(width);
-                  if (isOutsideField) { signalMeter.style.margin = '4px 0 0 ' + margin; }
-                  if (isOutsideField) { markerCanvas.style.margin = '4px 0 0 ' + margin; } else { markerCanvas.style.margin = '4px 0 0 -' + width; }
-                  if (isEnabledSquelch) { drawMarker(markerPosition); }
               } else {
-                  width = '256px';
-                  margin = offset + 'px';
-                  signalMeter.style.width = width;
-                  signalMeter.width = parseInt(width);
-                  if (isEnabledSquelch) { markerCanvas.style.width = width; }
-                  if (isEnabledSquelch) { markerCanvas.width = parseInt(width); }
-                  if (isOutsideField) { signalMeter.style.margin = '2px 0 0 ' + margin; }
-                  if (isOutsideField) { markerCanvas.style.margin = '2px 0 0 ' + margin; } else if (isEnabledSquelch) { markerCanvas.style.margin = '2px 0 0 -' + width; }
-                  if (isEnabledSquelch) { drawMarker(markerPosition); }
+                  // Drawn numbers
+                  if (windowWidth > 768 && !isSdrGraphVisible) {
+                      // Width and margin adjustments here
+                      width = '76.655%';
+                      if (!existsPeakmeter && OutsideField) {
+                          margin = '-38.333%';
+                      } else {
+                          margin = '0';
+                      }
+                      signalMeter.style.maxWidth = '256px';
+                      signalMeter.style.width = width;
+                      signalMeter.width = 256;
+                      markerCanvas.style.width = width;
+                      markerCanvas.width = 256;
+                      if (windowWidth < 1180 || existsSignal.offsetWidth <= 320) if (isOutsideField) { signalMeter.style.margin = '4px 0 0 ' + margin; }
+                      if (windowWidth < 1180 || existsSignal.offsetWidth <= 320) if (isOutsideField) { markerCanvas.style.margin = '4px 0 0 ' + margin; } else { markerCanvas.style.margin = '4px 0 0 -' + width; }
+                      if (isEnabledSquelch) { drawMarker(markerPosition); }
+                  } else {
+                      width = '256px';
+                      signalMeter.style.maxWidth = '256px';
+                      margin = offset + 'px';
+                      signalMeter.style.width = width;
+                      signalMeter.width = parseInt(width);
+                      if (isEnabledSquelch) { markerCanvas.style.width = width; }
+                      if (isEnabledSquelch) { markerCanvas.width = parseInt(width); }
+                      if (isOutsideField) { signalMeter.style.margin = '2px 0 0 ' + margin; }
+                      if (isOutsideField) { markerCanvas.style.margin = '2px 0 0 ' + margin; } else if (isEnabledSquelch) { markerCanvas.style.margin = '2px 0 0 -' + width; }
+                      if (isEnabledSquelch) { drawMarker(markerPosition); }
+                  }
               }
 
               if (!(/Mobi|Android/i.test(navigator.userAgent)) && windowWidth > 768 && windowHeight > fullHeight) {
@@ -615,7 +656,7 @@ var pluginSignalMeterSmallSquelchActive = false;
               }
 
               if (!isNaN(signalStrength)) {
-                  drawSignalMeter(signalStrength, signalStrengthHighest, ctx, backgroundImage, signalMeter);
+                  drawSignalMeter(signalStrength, signalStrengthHighest, ctx, useLegacyImages ? backgroundImage : null, signalMeter);
               }
           }, 125);
 
@@ -711,35 +752,115 @@ var pluginSignalMeterSmallSquelchActive = false;
 
   if (isEnabledSquelch) { setInterval(checkSquelch, 1000); }
 
+  // Function to draw scale marks and numbers manually (similar to peakmeter.js)
+  function drawScaleMarks(ctx, signalMeter) {
+      // Draw background bar for meter area
+      ctx.fillStyle = useThemeColors ?
+          getComputedStyle(document.documentElement).getPropertyValue('--color-1-transparent').trim() :
+          '#0f0f0f';
+      // Draw background for the meter bar area
+      ctx.fillRect(minMeterPosition, 0, signalMeter.width - minMeterPosition - maxMeterPosition, 4);
+
+      // Draw "S" in top-left corner
+      ctx.font = '8px Arial, sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'left';
+      ctx.fillText('S', meterBeginsAtS0 ? 5.5 : 0, 6);
+
+      let allTickPositions, numberPositions, numberValues;
+
+      ctx.font = '9px Arial, sans-serif';
+
+      if (meterBeginsAtS0) {
+          // Tick positions
+          allTickPositions = [16, 28, 40, 52, 64, 76, 88, 100, 112, 124, 144, 164, 184, 204, 224, 244];
+        
+          // Number positions for 1, 3, 5, 7, 9
+          let baseNumberPositions = [28, 52, 76, 100, 124, 144, 164, 184, 204, 224, 244];
+        
+          // Adjust +10 to +60 number positions by shifting slightly left, ignoring "+"
+          numberPositions = baseNumberPositions.map((pos, index) => 
+              index >= 5 ? pos - 3 : pos
+          );
+        
+          numberValues = ['1', '3', '5', '7', '9', '+10', '+20', '+30', '+40', '+50', '+60'];
+      } else {
+          allTickPositions = [16, 28, 40, 52, 64, 76, 88, 100, 112, 124, 144, 164, 184, 204, 224, 244];
+        
+          let baseNumberPositions = [28, 52, 76, 100, 124, 144, 164, 184, 204, 224, 244];
+        
+          numberPositions = baseNumberPositions.map((pos, index) => 
+              index >= 5 ? pos - 3 : pos
+          );
+        
+          numberValues = ['1', '3', '5', '7', '9', '+10', '+20', '+30', '+40', '+50', '+60'];
+      }
+
+      // Text alignment for numbers
+      ctx.textAlign = 'center';
+
+      // Draw tick marks
+      allTickPositions.forEach((pos, index) => {
+          if (pos < signalMeter.width - maxMeterPosition) {
+              ctx.beginPath();
+              ctx.moveTo(pos, 3);
+              ctx.lineTo(pos, 5);
+
+              if (index <= 9) {
+                  ctx.strokeStyle = '#08C818'; // Green
+              } else {
+                  ctx.strokeStyle = '#E81808'; // Red
+              }
+              ctx.lineWidth = 2;
+              ctx.stroke();
+          }
+      });
+
+      // Draw numbers
+      ctx.fillStyle = '#FFFFFF';
+
+      numberPositions.forEach((pos, index) => {
+          if (pos < signalMeter.width - maxMeterPosition && index < numberValues.length) {
+              ctx.fillText(numberValues[index], pos, signalMeter.height);
+          }
+      });
+  }
+
   function drawSignalMeter(signalValue, signalValueHighest, ctx, backgroundImage, signalMeter) {
       // Clear the canvas before redrawing
       ctx.clearRect(0, 0, signalMeter.width, signalMeter.height);
 
-      // Redraw the background image
-      ctx.drawImage(backgroundImage, 0, 0, signalMeter.width, signalMeter.height - 1);
+      if (useLegacyImages && backgroundImage) {
+          // Legacy: use base64 PNG images
+          // Redraw the background image
+          ctx.drawImage(backgroundImage, 0, 0, signalMeter.width, signalMeter.height - 1);
 
-      // Invert canvas colour if text colour is dark
-      function getLuminance(rgb) {
-          const [r, g, b] = rgb.map(value => value / 255);
-          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      }
-      const computedStyleBackgroundColor = getComputedStyle(document.documentElement);
-      const colorMain = computedStyleBackgroundColor.getPropertyValue('--color-text').trim();
-      const rgbMatch = colorMain.match(/\d+/g);
-      if (rgbMatch) {
-        const rgbValues = rgbMatch.map(Number); // Convert strings to numbers
-        const luminance = getLuminance(rgbValues);
-        if (luminance < 0.5) {
-        const imageData = ctx.getImageData(0, 0, signalMeter.width, signalMeter.height - 1);
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          data[i] = 255 - data[i];     // Invert red
-          data[i + 1] = 255 - data[i + 1]; // Invert green
-          data[i + 2] = 255 - data[i + 2]; // Invert blue
-          // data[i + 3] is the alpha channel, keep it unchanged
-        }
-        ctx.putImageData(imageData, 0, 0);
-        }
+          // Invert canvas colour if text colour is dark
+          function getLuminance(rgb) {
+              const [r, g, b] = rgb.map(value => value / 255);
+              return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          }
+          const computedStyleBackgroundColor = getComputedStyle(document.documentElement);
+          const colorMain = computedStyleBackgroundColor.getPropertyValue('--color-text').trim();
+          const rgbMatch = colorMain.match(/\d+/g);
+          if (rgbMatch) {
+            const rgbValues = rgbMatch.map(Number); // Convert strings to numbers
+            const luminance = getLuminance(rgbValues);
+            if (luminance < 0.5) {
+            const imageData = ctx.getImageData(0, 0, signalMeter.width, signalMeter.height - 1);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+              data[i] = 255 - data[i];     // Invert red
+              data[i + 1] = 255 - data[i + 1]; // Invert green
+              data[i + 2] = 255 - data[i + 2]; // Invert blue
+              // data[i + 3] is the alpha channel, keep it unchanged
+            }
+            ctx.putImageData(imageData, 0, 0);
+            }
+          }
+      } else {
+          // Modern: draw scale marks and numbers
+          drawScaleMarks(ctx, signalMeter);
       }
 
       // Draw the dark gray line in the background
@@ -781,7 +902,7 @@ var pluginSignalMeterSmallSquelchActive = false;
         */
         // Convert reported dBm noise floor value to pixels
         let sRepValue;
-        if (radioNoiseFloor >= -140 && radioNoiseFloor <= -114) {
+        if (radioNoiseFloor >= -150 && radioNoiseFloor <= -114) {
           sRepValue = ((2 * radioNoiseFloor) + 310).toFixed(1);
         } else {
           sRepValue = 64;

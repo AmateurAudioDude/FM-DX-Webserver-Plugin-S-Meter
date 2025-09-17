@@ -32,6 +32,13 @@ Displayed outside or within the SIGNAL container, your choice.
 
 `radioNoiseFloor`: The reported dBm signal reading with no antenna connected, used to calibrate enableLowSignalInterpolation.
 
+`useLegacyImages`: Set to true to use original base64 PNG images instead of manually drawn numbers and scale markers.
+
+
+v1.3.6
+------
+* Numbers and scale markers manually drawn (to match PeakMeter plugin design)
+* Minor fixes
 
 v1.3.5
 ------
