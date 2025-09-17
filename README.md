@@ -16,24 +16,21 @@ Displayed outside or within the SIGNAL container, your choice.
 
 #### Open `pluginSignalMeterSmall.js` with a text editor to find available options at the beginning of the file.
 
-`OutsideField`: Where the S-Meter is to be displayed, within the SIGNAL container, or below it.
+`OUTSIDE_FIELD`: Where the S-Meter is to be displayed, within the SIGNAL container, or below it.
 
-`enableSquelch`: Server-side squelch that mutes all signals below the set threshold. Squelch settings does not affect other listeners.
+`ENABLE_SQUELCH`: Server-side squelch that mutes all signals below the set threshold. Squelch settings does not affect other listeners.
 
-`enableLowSignalInterpolation`: Because approximately -123dBm is the reported noise floor with TEF receivers, the S-Meter will never fall below this level (approx. S4). This attempts to calculate and correct those values based on the signals below -114dBm (just below S6), where true signal deviation from reported signal begins.
+`USE_THEME_COLORS`: Background uses the webpage's theme instead of the default grey style.
 
-`squelchMutePercentage`: Volume percentage while squelch is active. Recommended setting is either 0 or 1.
+`RADIO_NOISE_FLOOR`: Because approximately -123dBm is the reported noise floor with TEF receivers, the S-Meter will never fall below this level (approx. S4). This attempts to calculate and correct those values based on the signals below -114dBm (just below S6), where true signal deviation from reported signal begins. The reported dBm signal reading with no antenna connected, used to calibrate enableLowSignalInterpolation. A setting of 0 disables this setting.
 
-`squelchNeedleSmall`: More discreet needle that might be harder to see.
+`METER_LOCATION`: Set to 'auto' for default meter position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'.
 
-`meterBeginsAtS0`: Limits the meter's range from **S0** to **S9+60**.
 
-`useThemeColors`: Background uses the webpage's theme instead of the default grey style.
-
-`radioNoiseFloor`: The reported dBm signal reading with no antenna connected, used to calibrate enableLowSignalInterpolation.
-
-`useLegacyImages`: Set to true to use original base64 PNG images instead of manually drawn numbers and scale markers.
-
+v1.3.7
+------
+* Removed unneeded code
+* Minor fixes
 
 v1.3.6
 ------
