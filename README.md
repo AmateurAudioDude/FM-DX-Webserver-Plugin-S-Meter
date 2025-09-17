@@ -16,13 +16,13 @@ Displayed outside or within the SIGNAL container, your choice.
 
 #### Open `pluginSignalMeterSmall.js` with a text editor to find available options at the beginning of the file.
 
-`OUTSIDE_FIELD`: Where the S-Meter is to be displayed, within the SIGNAL container, or below it.
+`OUTSIDE_FIELD`: Where the S-Meter is to be displayed, within the SIGNAL panel, or below it.
 
-`ENABLE_SQUELCH`: Server-side squelch that mutes all signals below the set threshold. Squelch settings does not affect other listeners.
+`ENABLE_SQUELCH`: Adjustable squelch marker that mutes all signals below the set threshold. Squelch setting does not affect other listeners.
 
 `USE_THEME_COLORS`: Background uses the webpage's theme instead of the default grey style.
 
-`RADIO_NOISE_FLOOR`: Because approximately -123dBm is the reported noise floor with TEF receivers, the S-Meter will never fall below this level (approx. S4). This attempts to calculate and correct those values based on the signals below -114dBm (just below S6), where true signal deviation from reported signal begins. The reported dBm signal reading with no antenna connected, used to calibrate enableLowSignalInterpolation. A setting of 0 disables this setting.
+`RADIO_NOISE_FLOOR`: Because approximately -123dBm is the reported noise floor with TEF receivers (reported dBm signal reading with no antenna connected), the S-Meter will never fall below this level (approx. S4). This attempts to calculate and correct those values based on the signals below -114dBm (just below S6), where true signal deviation from reported signal begins. This is used to calibrate low signal interpolation. A setting of 0 disables this setting.
 
 `METER_LOCATION`: Set to 'auto' for default meter position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'.
 
