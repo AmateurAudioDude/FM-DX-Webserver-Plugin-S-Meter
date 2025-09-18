@@ -552,8 +552,10 @@ var pluginSignalMeterSmallSquelchActive = false;
                   signalMeter.width = 256;
                   markerCanvas.style.width = width;
                   markerCanvas.width = 256;
-                  if (windowWidth < 1180 || existsSignal.offsetWidth <= 320) if (isOutsideField) { signalMeter.style.margin = '4px 0 0 ' + margin; }
-                  if (windowWidth < 1180 || existsSignal.offsetWidth <= 320) if (isOutsideField) { markerCanvas.style.margin = '4px 0 0 ' + margin; } else { markerCanvas.style.margin = '4px 0 0 -' + width; }
+                  if (window.location.pathname !== '/setup') {
+                      if (windowWidth < 1180 || existsSignal.offsetWidth <= 320) if (isOutsideField) { signalMeter.style.margin = '4px 0 0 ' + margin; }
+                      if (windowWidth < 1180 || existsSignal.offsetWidth <= 320) if (isOutsideField) { markerCanvas.style.margin = '4px 0 0 ' + margin; } else { markerCanvas.style.margin = '4px 0 0 -' + width; }
+                  }
                   if (isEnabledSquelch) { drawMarker(markerPosition); }
               } else {
                   width = '256px';
