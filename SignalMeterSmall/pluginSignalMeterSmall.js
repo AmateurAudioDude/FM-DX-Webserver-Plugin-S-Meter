@@ -1,5 +1,5 @@
 /*
-    Signal Meter Small v1.3.7 by AAD
+    Signal Meter Small v1.3.8 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter
 
     Original concept by Analog Signal Meter: https://github.com/NO2CW/FM-DX-Webserver-analog-signal-meter
@@ -19,11 +19,12 @@ var pluginSignalMeterSmallSquelchActive = false;
   const ENABLE_SQUELCH = true;                // Allow squelch function to be used
   const USE_THEME_COLORS = true;              // Background matches theme
   const RADIO_NOISE_FLOOR = -123;             // The reported dBm signal reading with no antenna connected used to calibrate low signal interpolation, or 0 to disable
+  const AM_OFFSET = true;                     // For below 27 MHz, S9 becomes -73dBm, includes an additional offset of up to 20 dB, and disables RADIO_NOISE_FLOOR
   const METER_LOCATION = 'auto';              // Set to 'auto' for default position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'
 
   //////////////////////////////////////////////////
 
-  const pluginVersion = '1.3.7';
+  const pluginVersion = '1.3.8';
   const pluginName = "Signal Meter Small";
   const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter/refs/heads/main/SignalMeterSmall/pluginSignalMeterSmall.js";
@@ -40,7 +41,7 @@ var pluginSignalMeterSmallSquelchActive = false;
   let minMeterStart = minMeterPosition + 1; // Starting position for needle and marker
   let fullHeight = 720;
   let offset, markerPosition, markerPositionMin, markerPositionMax, showMarker;
-  let signalStrength, signalStrengthHighest, needlePositionHighest;
+  let signalStrength, currentFrequency, signalStrengthHighest, needlePositionHighest;
 
   const rotatorOffset = METER_LOCATION === 'auto-rotator' ? 200 : 0;
   const debugMode = false; // For debugging purposes only
@@ -531,6 +532,26 @@ var pluginSignalMeterSmallSquelchActive = false;
               signalStrengthHighest = parseFloat(signalStrengthHighestText);
               signalStrengthHighest += (textContent === 'dbm' ? 120 : textContent === 'dbuv' ? 11.25 : 0);
 
+              // AM offset formula
+              if (AM_OFFSET) {
+                  const frequencyElement = document.getElementById('data-frequency');
+                  currentFrequency = frequencyElement ? frequencyElement.textContent : '87.5';
+                  if (currentFrequency <= 27) {
+                      let amTefOffset;
+
+                      if (currentFrequency <= 10) {
+                          amTefOffset = 40;
+                      } else {
+                          // Linear interpolation between an offset of 40 up to 10 MHz and an offset of 20 at 27 MHz
+                          const t = (currentFrequency - 10) / (27 - 10);
+                          amTefOffset = 40 - t * (40 - 20);
+                      }
+
+                      signalStrength -= amTefOffset;
+                      signalStrengthHighest -= amTefOffset;
+                  }
+              }
+
               // Resize if needed
               let width, margin;
 
@@ -818,7 +839,7 @@ var pluginSignalMeterSmallSquelchActive = false;
       needlePositionHighest = Math.min(normalizedStrengthHighest * maxPosition, meterWidth);
 
       // Low signal interpolation
-      if (RADIO_NOISE_FLOOR) {
+      if (RADIO_NOISE_FLOOR && (!AM_OFFSET || currentFrequency > 27)) {
           let sRepValue;
           if (RADIO_NOISE_FLOOR >= -150 && RADIO_NOISE_FLOOR <= -114) {
               sRepValue = ((2 * RADIO_NOISE_FLOOR) + 310).toFixed(1);
