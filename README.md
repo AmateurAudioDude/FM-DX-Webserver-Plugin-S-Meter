@@ -29,7 +29,7 @@ Displayed outside or within the SIGNAL container, your choice.
 
 v1.3.8
 ------
-* Added AM offset option for more accurate readings on the HF band.
+* Added AM offset option for more accurate readings on the HF band (calibrated to TEF radio/module only).
 
 v1.3.7
 ------
