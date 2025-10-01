@@ -19,7 +19,7 @@ var pluginSignalMeterSmallSquelchActive = false;
   const ENABLE_SQUELCH = true;                // Allow squelch function to be used
   const USE_THEME_COLORS = true;              // Background matches theme
   const RADIO_NOISE_FLOOR = -123;             // The reported dBm signal reading with no antenna connected used to calibrate low signal interpolation, or 0 to disable
-  const AM_OFFSET = true;                     // For below 27 MHz, S9 becomes -73dBm, includes an additional offset of up to 20 dB, and disables RADIO_NOISE_FLOOR
+  const AM_OFFSET = false;                    // For below 27 MHz, S9 becomes -73dBm, includes an additional offset of up to 20 dB, and disables RADIO_NOISE_FLOOR
   const METER_LOCATION = 'auto';              // Set to 'auto' for default position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'
 
   //////////////////////////////////////////////////
