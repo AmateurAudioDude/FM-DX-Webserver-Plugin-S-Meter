@@ -24,6 +24,8 @@ Displayed outside or within the SIGNAL container, your choice.
 
 `RADIO_NOISE_FLOOR`: Because approximately -123dBm is the reported noise floor with TEF receivers (reported dBm signal reading with no antenna connected), the S-Meter will never fall below this level (approx. S4). This attempts to calculate and correct those values based on the signals below -114dBm (just below S6), where true signal deviation from reported signal begins. This is used to calibrate low signal interpolation. A setting of 0 disables this setting.
 
+`AM_OFFSET`: Recommended for TEF668X only. By default, S9 equals -93dBm for VHF and above. This offsets S9 to -73dBm for 27MHz and below, the IARU Region 1 Technical Recommendation. An additional offset of up to 20 dB, depending on frequency, is also applied, for improved calibration throughout the HF band, and assumes the TEF668X RF level offset is set to 0. RADIO_NOISE_FLOOR is also disabled for the HF band.
+
 `METER_LOCATION`: Set to 'auto' for default meter position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'.
 
 
