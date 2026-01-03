@@ -64,7 +64,15 @@ var pluginSignalMeterSmallSquelchActive = false;
           if (setMeterLocation !== 'sdr-graph' && setMeterLocation !== 'sdr-graph-only') {
               existsPeakmeter = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.includes('PEAKMETER'));
           }
-          let existsSignal = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.includes('SIGNAL'));
+
+          let existsSignal;
+
+          if (METER_LOCATION !== "sdr-graph-only") {
+              existsSignal = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.includes("SIGNAL"));
+          } else {
+              existsSignal = document.querySelector('#sdr-graph');
+          }
+
           let offsetPeakmeter = -50;
           let container;
           const signalMeter = document.createElement('canvas');
