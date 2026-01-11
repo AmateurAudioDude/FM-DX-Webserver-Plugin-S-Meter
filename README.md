@@ -29,6 +29,10 @@ Displayed outside or within the SIGNAL container, your choice.
 `METER_LOCATION`: Set to 'auto' for default meter position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'.
 
 
+v1.3.9
+------
+* Fix for plugins that remove signal strength element
+
 v1.3.8
 ------
 * Added AM offset option for more accurate readings on the HF band (calibrated to TEF radio/module only).

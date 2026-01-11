@@ -1,5 +1,5 @@
 /*
-    Signal Meter Small v1.3.8 by AAD
+    Signal Meter Small v1.3.9 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter
 
     Original concept by Analog Signal Meter: https://github.com/NO2CW/FM-DX-Webserver-analog-signal-meter
@@ -24,7 +24,7 @@ var pluginSignalMeterSmallSquelchActive = false;
 
   //////////////////////////////////////////////////
 
-  const pluginVersion = '1.3.8';
+  const pluginVersion = '1.3.9';
   const pluginName = "Signal Meter Small";
   const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter/refs/heads/main/SignalMeterSmall/pluginSignalMeterSmall.js";
@@ -45,6 +45,11 @@ var pluginSignalMeterSmallSquelchActive = false;
 
   const rotatorOffset = METER_LOCATION === 'auto-rotator' ? 200 : 0;
   const debugMode = false; // For debugging purposes only
+
+  // API variables
+  const LISTENER_TIMEOUT_DURATION = 125;
+  let messageHandler = null;
+  let lastProcessedTime = 0, sig = 0, topSig = 0;
 
   function initSignalMeterSmall() {
       document.addEventListener('DOMContentLoaded', function() {
@@ -100,7 +105,7 @@ var pluginSignalMeterSmallSquelchActive = false;
 
               // If no panel found with SIGNAL, return
               if (!existsSignal) {
-                  console.log("Signal Meter Small: No SIGNAL panel found.");
+                  console.log(`[${pluginName}] No SIGNAL panel found.`);
                   return;
               }
 
@@ -525,20 +530,76 @@ var pluginSignalMeterSmallSquelchActive = false;
                   markerCanvas.style.margin = '4px 0 0 -256px';
                   markerCanvas.style.position = 'relative';
               }
+
               // Store current signal strength in variable
               const signalElement = document.getElementById('data-signal');
-              const signalDecimalElement = document.getElementById('data-signal-decimal');
-              const signalStrengthText = signalElement ? signalElement.textContent : '0';
-              const signalStrengthDecimalText = signalDecimalElement ? signalDecimalElement.textContent : '0';
-              signalStrength = parseFloat(signalStrengthText) + (signalStrengthText >= 0 ? parseFloat(signalStrengthDecimalText) : -parseFloat(signalStrengthDecimalText));
-              const textContent = localStorage.getItem('signalUnit');
-              signalStrength += (textContent === 'dbm' ? 120 : textContent === 'dbuv' ? 11.25 : 0);
 
-              // Store peak signal strength in variable
-              const signalHighestElement = document.getElementById('data-signal-highest');
-              const signalStrengthHighestText = signalHighestElement ? signalHighestElement.textContent : '0';
-              signalStrengthHighest = parseFloat(signalStrengthHighestText);
-              signalStrengthHighest += (textContent === 'dbm' ? 120 : textContent === 'dbuv' ? 11.25 : 0);
+              // Legacy method
+              function legacySignalStrength() {
+                const signalDecimalElement = document.getElementById('data-signal-decimal');
+                let signalStrengthText = signalElement ? signalElement.textContent : '0';
+                const signalStrengthDecimalText = signalDecimalElement ? signalDecimalElement.textContent : '0';
+                signalStrength = parseFloat(signalStrengthText) + (signalStrengthText >= 0 ? parseFloat(signalStrengthDecimalText) : -parseFloat(signalStrengthDecimalText));
+                const textContent = localStorage.getItem('signalUnit');
+                signalStrength += (textContent === 'dbm' ? 120 : textContent === 'dbuv' ? 11.25 : 0);
+
+                // Store peak signal strength in variable
+                const signalHighestElement = document.getElementById('data-signal-highest');
+                let signalStrengthHighestText = signalHighestElement ? signalHighestElement.textContent : '0';
+                signalStrengthHighest = parseFloat(signalStrengthHighestText);
+                signalStrengthHighest += (textContent === 'dbm' ? 120 : textContent === 'dbuv' ? 11.25 : 0);
+              }
+
+              // API method
+              function apiSignalStrength() {
+                  if (messageHandler) return;
+
+                  console.log(`[${pluginName}] Using API method to fetch signal strength`);
+
+                  messageHandler = (event) => {
+                      const now = Date.now();
+                      if (now - lastProcessedTime < LISTENER_TIMEOUT_DURATION) return;
+                      lastProcessedTime = now;
+
+                      const { sigRaw, sigTop } = JSON.parse(event.data);
+
+                      if (sigRaw && sigTop) {
+                          const sigRawValues = sigRaw.split(',');
+
+                          if (sigRawValues.length >= 2) {
+                              sig = parseFloat(sigRawValues[0].slice(2));
+                              topSig = parseFloat(sigTop);
+
+                              signalStrength = sig;
+                              signalStrengthHighest = topSig;
+                          } else {
+                              console.error(`[${pluginName}] sigRaw data format invalid`);
+                          }
+                      }
+                  };
+
+                  socket.addEventListener("message", messageHandler);
+              }
+
+              function stopApiSignalStrength() {
+                  if (!messageHandler) return;
+
+                  socket.removeEventListener("message", messageHandler);
+                  messageHandler = null;
+
+                  console.log(`[${pluginName}] API listener stopped`);
+              }
+
+              if (!signalElement) {
+                  apiSignalStrength();
+              } else {
+                  legacySignalStrength();
+                  stopApiSignalStrength();
+              }
+
+              // 1 decimal place
+              signalStrength = Math.round(Number(signalStrength) * 10) / 10;
+              signalStrengthHighest = Math.round(Number(signalStrengthHighest) * 10) / 10;
 
               // AM offset formula
               if (AM_OFFSET) {
