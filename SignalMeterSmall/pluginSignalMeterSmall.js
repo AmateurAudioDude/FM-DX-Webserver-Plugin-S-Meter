@@ -45,6 +45,7 @@ var pluginSignalMeterSmallSquelchActive = false;
 
   const rotatorOffset = METER_LOCATION === 'auto-rotator' ? 200 : 0;
   const debugMode = false; // For debugging purposes only
+  const CAL90000 = 0.0, CAL95500 = 0.0, CAL100500 = 0.0, CAL105500 = 0.0; // Signal calibration
 
   // API variables
   const LISTENER_TIMEOUT_DURATION = 125;
@@ -561,14 +562,23 @@ var pluginSignalMeterSmallSquelchActive = false;
                       if (now - lastProcessedTime < LISTENER_TIMEOUT_DURATION) return;
                       lastProcessedTime = now;
 
-                      const { sigRaw, sigTop } = JSON.parse(event.data);
+                      const { freq, sigRaw, sigTop } = JSON.parse(event.data);
 
                       if (sigRaw && sigTop) {
                           const sigRawValues = sigRaw.split(',');
 
                           if (sigRawValues.length >= 2) {
+                              // Remove 2-letter prefix and parse number
                               sig = parseFloat(sigRawValues[0].slice(2));
                               topSig = parseFloat(sigTop);
+
+                              // Signal calibration
+                              if (CAL90000 || CAL95500 || CAL100500 || CAL105500) {
+                                  const _f = parseFloat(freq);
+                                  let adjustment = (_f >= 87 && _f < 93) ? CAL90000 : (_f >= 93 && _f < 98) ? CAL95500 : (_f >= 98 && _f < 103) ? CAL100500 : (_f >= 103 && _f <= 108) ? CAL105500 : 0;
+                                  sig = parseFloat(sig);
+                                  if (sig > 15) sig += adjustment * ((sig <= 20 ? (sig - 15) / 5 : 1));
+                              }
 
                               signalStrength = sig;
                               signalStrengthHighest = topSig;
