@@ -29,6 +29,10 @@ Displayed outside or within the SIGNAL container, your choice.
 `METER_LOCATION`: Set to 'auto' for default meter position, or force with 'signal', 'sdr-graph', 'sdr-graph-only', 'peakmeter', or 'auto-rotator'.
 
 
+v1.4.0
+------
+* Fix for FM-DX Webserver v1.4.0 compatibility issues
+
 v1.3.9
 ------
 * Fix for plugins that remove signal strength element

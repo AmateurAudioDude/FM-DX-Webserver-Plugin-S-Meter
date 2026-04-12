@@ -1,5 +1,5 @@
 /*
-    Signal Meter Small v1.3.9 by AAD
+    Signal Meter Small v1.4.0 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter
 
     Original concept by Analog Signal Meter: https://github.com/NO2CW/FM-DX-Webserver-analog-signal-meter
@@ -24,7 +24,7 @@ var pluginSignalMeterSmallSquelchActive = false;
 
   //////////////////////////////////////////////////
 
-  const pluginVersion = '1.3.9';
+  const pluginVersion = '1.4.0';
   const pluginName = "Signal Meter Small";
   const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter/refs/heads/main/SignalMeterSmall/pluginSignalMeterSmall.js";
@@ -68,13 +68,13 @@ var pluginSignalMeterSmallSquelchActive = false;
           }
           let existsPeakmeter;
           if (setMeterLocation !== 'sdr-graph' && setMeterLocation !== 'sdr-graph-only') {
-              existsPeakmeter = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.includes('PEAKMETER'));
+              existsPeakmeter = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.toLowerCase().includes('peakmeter'));
           }
 
           let existsSignal;
 
           if (METER_LOCATION !== "sdr-graph-only") {
-              existsSignal = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.includes("SIGNAL"));
+              existsSignal = panels.find(panel => panel.querySelector('h2') && panel.querySelector('h2').textContent.toLowerCase().includes("signal"));
           } else {
               existsSignal = document.querySelector('#sdr-graph');
           }
