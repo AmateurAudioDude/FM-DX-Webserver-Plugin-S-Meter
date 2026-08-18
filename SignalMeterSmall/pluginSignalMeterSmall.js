@@ -1,5 +1,5 @@
 /*
-    Signal Meter Small v1.4.0 by AAD
+    Signal Meter Small v1.4.1 by AAD
     https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter
 
     Original concept by Analog Signal Meter: https://github.com/NO2CW/FM-DX-Webserver-analog-signal-meter
@@ -24,7 +24,7 @@ var pluginSignalMeterSmallSquelchActive = false;
 
   //////////////////////////////////////////////////
 
-  const pluginVersion = '1.4.0';
+  const pluginVersion = '1.4.1';
   const pluginName = "Signal Meter Small";
   const pluginHomepageUrl = "https://github.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter";
   const pluginUpdateUrl = "https://raw.githubusercontent.com/AmateurAudioDude/FM-DX-Webserver-Plugin-S-Meter/refs/heads/main/SignalMeterSmall/pluginSignalMeterSmall.js";
@@ -600,7 +600,15 @@ var pluginSignalMeterSmallSquelchActive = false;
                   console.log(`[${pluginName}] API listener stopped`);
               }
 
+              const signalTextIsNumeric = signalElement && isFinite(Number(signalElement.textContent));
+              const uiapeDbfAvailable = isFinite(window.uiapeSignalDbf) && isFinite(window.uiapeSignalHighestDbf);
               if (!signalElement) {
+                  apiSignalStrength();
+              } else if (!signalTextIsNumeric && uiapeDbfAvailable) {
+                  signalStrength = window.uiapeSignalDbf;
+                  signalStrengthHighest = window.uiapeSignalHighestDbf;
+                  stopApiSignalStrength();
+              } else if (!signalTextIsNumeric) {
                   apiSignalStrength();
               } else {
                   legacySignalStrength();
