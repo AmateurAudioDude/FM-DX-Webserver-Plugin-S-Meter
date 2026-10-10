@@ -533,7 +533,9 @@ var pluginSignalMeterSmallSquelchActive = false;
               }
 
               // Store current signal strength in variable
-              const signalElement = document.getElementById('data-signal');
+              // MetricsMonitor's SIGNAL panel has its own #data-signal, which can hold a different unit to core's
+              const pageSignalElement = document.getElementById('data-signal');
+              const signalElement = pageSignalElement && !pageSignalElement.closest('#level-meter-container') ? pageSignalElement : null;
 
               // Legacy method
               function legacySignalStrength() {
@@ -562,7 +564,14 @@ var pluginSignalMeterSmallSquelchActive = false;
                       if (now - lastProcessedTime < LISTENER_TIMEOUT_DURATION) return;
                       lastProcessedTime = now;
 
-                      const { freq, sigRaw, sigTop } = JSON.parse(event.data);
+                      const { freq, sig: serverSig, sigRaw, sigTop } = JSON.parse(event.data);
+
+                      // sig is already calibrated by the server, sigRaw is the tuner's uncalibrated line
+                      if (sigTop !== undefined && serverSig !== undefined && isFinite(Number(serverSig))) {
+                          signalStrength = Number(serverSig);
+                          signalStrengthHighest = parseFloat(sigTop);
+                          return;
+                      }
 
                       if (sigRaw && sigTop) {
                           const sigRawValues = sigRaw.split(',');
